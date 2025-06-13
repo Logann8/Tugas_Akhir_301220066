@@ -1,3 +1,10 @@
+<?php
+session_start();
+if (!isset($_SESSION['user_id'])) {
+    header('Location: login.php');
+    exit;
+}
+?>
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -41,6 +48,10 @@
     <div class="topbar">
         <span class="fw-bold fs-5">SIKOPIN</span>
         <span id="datetime" class="text-muted"></span>
+        <div class="d-flex align-items-center gap-2">
+            <span class="fw-semibold text-dark"><?php echo htmlspecialchars($_SESSION['user_nama'] ?? $_SESSION['user_email']); ?></span>
+            <a href="logout.php" class="btn btn-outline-danger btn-sm rounded-pill ms-2">Logout <i class="bi bi-box-arrow-right"></i></a>
+        </div>
     </div>
     <div class="main-content">
         <h4 class="fw-bold mb-4">Dasbor</h4>

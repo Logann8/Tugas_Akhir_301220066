@@ -48,8 +48,12 @@
         <h5 class="text-center fw-bold mb-3">SIKOPIN</h5>
         <form action="proses_register.php" method="post">
             <div class="mb-3">
+                <label for="nama" class="form-label">Nama</label>
+                <input type="text" class="form-control" id="nama" name="nama" required autofocus>
+            </div>
+            <div class="mb-3">
                 <label for="email" class="form-label">Alamat email</label>
-                <input type="email" class="form-control" id="email" name="email" required autofocus>
+                <input type="email" class="form-control" id="email" name="email" required>
             </div>
             <div class="mb-3">
                 <label for="password" class="form-label">Kata sandi</label>

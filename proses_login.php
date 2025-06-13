@@ -13,7 +13,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($user && password_verify($password, $user['password'])) {
         $_SESSION['user_id'] = $user['id_petugas'];
         $_SESSION['user_email'] = $user['email'];
-        header('Location: index.php');
+        $_SESSION['user_nama'] = $user['nama'];
+        header('Location: dasbor.php');
         exit;
     } else {
         echo "<script>alert('Email atau kata sandi salah!'); window.location='login.php';</script>";
