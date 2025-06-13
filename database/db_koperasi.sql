@@ -46,4 +46,13 @@ CREATE TABLE IF NOT EXISTS angsuran (
     tanggal_bayar DATE,
     status ENUM('belum', 'sudah') DEFAULT 'belum',
     FOREIGN KEY (id_pinjaman) REFERENCES pinjaman(id_pinjaman)
+);
+
+-- Tabel Petugas
+CREATE TABLE IF NOT EXISTS petugas (
+    id_petugas INT PRIMARY KEY AUTO_INCREMENT,
+    email VARCHAR(100) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    nama VARCHAR(100),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ); 
