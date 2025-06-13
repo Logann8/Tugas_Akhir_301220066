@@ -1,8 +1,8 @@
 /* Custom styles */
 body {
+    background: #f6f6f6;
     min-height: 100vh;
-    display: flex;
-    flex-direction: column;
+    font-family: 'Segoe UI', Arial, sans-serif;
 }
 
 footer {
@@ -14,7 +14,10 @@ footer {
 }
 
 .card {
-    margin-bottom: 20px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    background: #fff;
+    margin-bottom: 1.5rem;
 }
 
 .table-responsive {
@@ -23,4 +26,96 @@ footer {
 
 .form-group {
     margin-bottom: 15px;
+}
+
+.sidebar {
+    min-height: 100vh;
+    background: #ffb366;
+    border-right: none;
+    padding-top: 1rem;
+    width: 220px;
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    z-index: 100;
+}
+
+.sidebar .profile-img {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: #fff;
+    object-fit: cover;
+    margin-bottom: 1rem;
+    border: 2px solid #fff;
+}
+
+.sidebar .nav-link {
+    color: #333;
+    border-radius: 8px;
+    margin-bottom: 4px;
+    font-weight: 500;
+    padding: 10px 16px;
+    display: flex;
+    align-items: center;
+    transition: background 0.2s;
+}
+
+.sidebar .nav-link.active, .sidebar .nav-link:hover {
+    background: #fff;
+    color: #ff9800;
+}
+
+.sidebar .nav-link i {
+    margin-right: 10px;
+    font-size: 1.2rem;
+}
+
+.topbar {
+    height: 56px;
+    background: #fff;
+    border-bottom: 1px solid #e0e0e0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 2rem 0 240px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.main-content {
+    margin-left: 240px;
+    padding: 2rem 2rem 2rem 2rem;
+}
+
+.card-stat {
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    background: #fff;
+    padding: 1.5rem 1rem;
+    text-align: center;
+    font-size: 1.1rem;
+    font-weight: 500;
+    margin-bottom: 1rem;
+}
+
+.card-stat .stat-title {
+    color: #888;
+    font-size: 1rem;
+    font-weight: 400;
+}
+
+.card-stat .stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #ff9800;
+}
+
+@media (max-width: 991px) {
+    .sidebar { width: 100px; }
+    .main-content { margin-left: 110px; padding: 1rem; }
+    .topbar { padding-left: 110px; }
+    .sidebar .nav-link span { display: none; }
 } 
