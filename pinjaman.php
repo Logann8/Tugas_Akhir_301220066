@@ -5,6 +5,9 @@ if (!isset($_SESSION['user_id']) || !in_array(($_SESSION['user_role'] ?? ''), $a
     header('Location: login.php');
     exit;
 }
+
+$user_role = $_SESSION['user_role'] ?? 'anggota'; // Default ke anggota jika tidak terdefinisi
+
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -18,7 +21,7 @@ if (!isset($_SESSION['user_id']) || !in_array(($_SESSION['user_role'] ?? ''), $a
 </head>
 <body>
     <div class="sidebar d-flex flex-column align-items-center p-3">
-        <img src="https://ui-avatars.com/api/?name=Admin" class="profile-img" alt="Profile">
+        <img src="https://ui-avatars.com/api/?name=<?php echo urlencode($_SESSION['user_nama'] ?? 'Admin'); ?>" class="profile-img" alt="Profile">
         <ul class="nav flex-column w-100">
             <li class="nav-item mb-1">
                 <a class="nav-link" href="dasbor.php"><i class="bi bi-house-door"></i> <span>Dasbor</span></a>
@@ -32,23 +35,33 @@ if (!isset($_SESSION['user_id']) || !in_array(($_SESSION['user_role'] ?? ''), $a
             <li class="nav-item mb-1 ms-2">
                 <a class="nav-link active" href="pinjaman.php"><i class="bi bi-cash-stack"></i> <span>Pinjaman</span></a>
             </li>
+
+            <?php if (in_array($user_role, ['ketua', 'petugas'])) : ?>
             <li class="nav-item mb-1 mt-2">
                 <span class="text-muted small ms-2">Master Data</span>
             </li>
             <li class="nav-item mb-1 ms-2">
                 <a class="nav-link" href="anggota.php"><i class="bi bi-people"></i> <span>Anggota</span></a>
             </li>
+            <?php endif; ?>
+
+            <?php if ($user_role === 'ketua') : ?>
             <li class="nav-item mb-1 mt-2">
                 <span class="text-muted small ms-2">Settings</span>
             </li>
             <li class="nav-item mb-1 ms-2">
                 <a class="nav-link" href="user.php"><i class="bi bi-person-gear"></i> <span>User</span></a>
             </li>
+            <?php endif; ?>
         </ul>
     </div>
     <div class="topbar">
         <span class="fw-bold fs-5">SIKOPIN</span>
         <span id="datetime" class="text-muted"></span>
+        <div class="d-flex align-items-center gap-2">
+            <span class="fw-semibold text-dark"><?php echo htmlspecialchars($_SESSION['user_nama'] ?? $_SESSION['user_email']); ?></span>
+            <a href="logout.php" class="btn btn-outline-danger btn-sm rounded-pill ms-2">Logout <i class="bi bi-box-arrow-right"></i></a>
+        </div>
     </div>
     <div class="main-content">
         <h4 class="fw-bold mb-4">Pinjaman</h4>
