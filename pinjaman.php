@@ -14,7 +14,7 @@ require 'config/database.php';
 $query = "SELECT p.*, a.nama AS nama_anggota 
           FROM pinjaman p
           JOIN anggota a ON p.id_anggota = a.id_anggota
-          ORDER BY p.tanggal_pinjam DESC";
+          ORDER BY p.tanggal_pinjaman DESC";
 $result = mysqli_query($conn, $query);
 
 ?>
@@ -118,7 +118,7 @@ $result = mysqli_query($conn, $query);
                                 $bunga_formatted = $row['bunga'] . '%';
                                 $total_pinjaman_formatted = 'Rp ' . number_format($row['total_pinjaman'], 0, ',', '.');
 
-                                $tanggal_pinjam_formatted = date('d F Y', strtotime($row['tanggal_pinjam']));
+                                $tanggal_pinjam_formatted = date('d F Y', strtotime($row['tanggal_pinjaman']));
                                 $tanggal_kembali_formatted = date('d F Y', strtotime($row['tanggal_kembali']));
 
                                 echo '<tr id="pinjaman-' . $row['id_pinjaman'] . '">';
