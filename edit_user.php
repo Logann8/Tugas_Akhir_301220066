@@ -105,6 +105,7 @@ if (!$user) {
                         <option value="ketua" <?php echo ($user['role'] == 'ketua' ? 'selected' : ''); ?>>Ketua</option>
                         <option value="petugas" <?php echo ($user['role'] == 'petugas' ? 'selected' : ''); ?>>Petugas</option>
                         <option value="anggota" <?php echo ($user['role'] == 'anggota' ? 'selected' : ''); ?>>Anggota</option>
+                        <option value="unassigned" <?php echo ($user['role'] == 'unassigned' ? 'selected' : ''); ?>>Belum Ditentukan</option>
                     </select>
                 </div>
                 <button type="submit" class="btn btn-primary rounded-pill px-4"><i class="bi bi-save"></i> Simpan Perubahan</button>

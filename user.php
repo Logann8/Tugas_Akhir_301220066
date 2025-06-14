@@ -109,7 +109,8 @@ $result = mysqli_query($conn, $query);
                                 $role_badge_class = (
                                     $row['role'] === 'ketua' ? 'bg-primary-subtle text-primary' :
                                     ($row['role'] === 'petugas' ? 'bg-info-subtle text-info' :
-                                    'bg-success-subtle text-success')
+                                    ($row['role'] === 'anggota' ? 'bg-success-subtle text-success' :
+                                    'bg-warning-subtle text-warning'))
                                 );
                                 echo '<tr id="user-' . $row['id_user'] . '">';
                                 echo '<td>' . $no++ . '</td>';

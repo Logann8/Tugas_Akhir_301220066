@@ -3,76 +3,75 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - SIKOPIN</title>
+    <title>Daftar Akun - SIKOPIN</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="assets/css/style.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
     <style>
-        body { background: #f8f9fa; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
-        .login-container {
-            max-width: 400px;
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f8f9fa; /* Light background */
+        }
+        .card {
             width: 100%;
-            border: 1px solid #e0e0e0;
-            border-radius: 8px;
-            padding: 30px;
-            background: #fff;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            max-width: 400px;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
-        .logo-img {
-            display: block;
-            margin: 0 auto 20px auto;
-            width: 100px; /* Adjust as needed */
-            height: auto;
-        }
-        .form-label {
-            font-weight: 500;
-            margin-bottom: 5px;
+        .form-control {
+            border-radius: 10px;
         }
         .btn-primary {
-            background-color: #ff9800 !important;
-            border-color: #ff9800 !important;
+            border-radius: 10px;
+            background-color: #007bff; /* Primary blue */
+            border-color: #007bff;
         }
         .btn-primary:hover {
-            background-color: #e68900 !important;
-            border-color: #e68900 !important;
+            background-color: #0056b3;
+            border-color: #0056b3;
         }
-        .login-link {
-            font-size: 0.95rem;
-            color: #ff9800;
-            font-weight: 600;
-        }
-        .login-link:hover {
-            text-decoration: underline;
+        .alert {
+            border-radius: 10px;
         }
     </style>
 </head>
 <body>
-    <div class="login-container text-center">
-        <img src="https://raw.githubusercontent.com/twbs/icons/main/icons/shield-fill.svg" alt="Logo Koperasi" class="logo-img">
-        <h5 class="fw-bold mb-1">Buat akun</h5>
-        <div class="mb-4">
-            <span>atau <a href="login.php" class="login-link">masuk ke akun yang sudah ada</a></span>
-        </div>
-        <h4 class="fw-bold mb-4">SIKOPIN</h4>
-        <form action="proses_register.php" method="post">
+    <div class="card p-4">
+        <h4 class="fw-bold text-center mb-4">Daftar Akun Baru</h4>
+        <?php
+        session_start();
+        if (isset($_SESSION['error_message'])) {
+            echo '<div class="alert alert-danger" role="alert">' . $_SESSION['error_message'] . '</div>';
+            unset($_SESSION['error_message']);
+        }
+        if (isset($_SESSION['success_message'])) {
+            echo '<div class="alert alert-success" role="alert">' . $_SESSION['success_message'] . '</div>';
+            unset($_SESSION['success_message']);
+        }
+        ?>
+        <form action="proses_register.php" method="POST">
             <div class="mb-3">
-                <label for="nama" class="form-label">Nama</label>
+                <label for="nama" class="form-label">Nama Lengkap</label>
                 <input type="text" class="form-control" id="nama" name="nama" required autofocus>
             </div>
             <div class="mb-3">
-                <label for="email" class="form-label">Alamat email</label>
+                <label for="email" class="form-label">Email</label>
                 <input type="email" class="form-control" id="email" name="email" required>
             </div>
             <div class="mb-3">
-                <label for="password" class="form-label">Kata sandi</label>
+                <label for="password" class="form-label">Password</label>
                 <input type="password" class="form-control" id="password" name="password" required>
             </div>
-            <div class="mb-4">
-                <label for="confirm_password" class="form-label">Konfirmasi kata sandi</label>
+            <div class="mb-3">
+                <label for="confirm_password" class="form-label">Konfirmasi Password</label>
                 <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
             </div>
-            <button type="submit" class="btn btn-primary w-100">Buat akun</button>
+            <button type="submit" class="btn btn-primary w-100 mb-3">Daftar</button>
+            <p class="text-center"><small>Sudah punya akun? <a href="login.php">Login di sini</a></small></p>
         </form>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html> 
