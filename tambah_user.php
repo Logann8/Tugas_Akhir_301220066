@@ -85,9 +85,12 @@ require 'config/database.php';
                     <label for="role" class="form-label">Role</label>
                     <select class="form-select" id="role" name="role" required>
                         <option value="">Pilih Role</option>
-                        <option value="ketua">Ketua</option>
-                        <option value="petugas">Petugas</option>
+                        <?php if ($user_role === 'ketua') : ?>
+                            <option value="ketua">Ketua</option>
+                            <option value="petugas">Petugas</option>
+                        <?php endif; ?>
                         <option value="anggota">Anggota</option>
+                        <option value="unassigned">Belum Ditentukan</option>
                     </select>
                 </div>
                 <button type="submit" class="btn btn-primary rounded-pill px-4"><i class="bi bi-plus"></i> Tambah User</button>

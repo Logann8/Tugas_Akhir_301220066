@@ -20,10 +20,21 @@ mysqli_stmt_execute($stmt_user);
 $result_user = mysqli_stmt_get_result($stmt_user);
 $user = mysqli_fetch_assoc($result_user);
 
+mysqli_stmt_close($stmt_user);
+
 if (!$user) {
     $_SESSION['error_message'] = "User tidak ditemukan.";
     header('Location: user.php');
     exit;
+}
+
+// Validasi tambahan: Petugas tidak bisa mengedit Ketua atau Petugas lain
+if ($user_role === 'petugas') {
+    if ($user['role'] === 'ketua' || $user['role'] === 'petugas') {
+        $_SESSION['error_message'] = "Petugas tidak diizinkan mengedit user dengan role Ketua atau Petugas.";
+        header('Location: user.php');
+        exit;
+    }
 }
 
 ?>
@@ -102,8 +113,10 @@ if (!$user) {
                     <label for="role" class="form-label">Role</label>
                     <select class="form-select" id="role" name="role" required>
                         <option value="">Pilih Role</option>
-                        <option value="ketua" <?php echo ($user['role'] == 'ketua' ? 'selected' : ''); ?>>Ketua</option>
-                        <option value="petugas" <?php echo ($user['role'] == 'petugas' ? 'selected' : ''); ?>>Petugas</option>
+                        <?php if ($user_role === 'ketua') : ?>
+                            <option value="ketua" <?php echo ($user['role'] == 'ketua' ? 'selected' : ''); ?>>Ketua</option>
+                            <option value="petugas" <?php echo ($user['role'] == 'petugas' ? 'selected' : ''); ?>>Petugas</option>
+                        <?php endif; ?>
                         <option value="anggota" <?php echo ($user['role'] == 'anggota' ? 'selected' : ''); ?>>Anggota</option>
                         <option value="unassigned" <?php echo ($user['role'] == 'unassigned' ? 'selected' : ''); ?>>Belum Ditentukan</option>
                     </select>

@@ -118,8 +118,19 @@ $result = mysqli_query($conn, $query);
                                 echo '<td>' . htmlspecialchars($row['nama']) . '</td>';
                                 echo '<td>' . htmlspecialchars($row['email']) . '</td>';
                                 echo '<td>';
-                                echo '<a href="edit_user.php?id=' . $row['id_user'] . '" class="text-primary me-2"><i class="bi bi-pencil"></i> Edit</a>';
-                                echo '<a href="#" onclick="confirmDelete(\'proses_hapus_user.php?id=' . $row['id_user'] . '\')" class="text-danger"><i class="bi bi-trash"></i> Hapus</a>';
+                                // Hanya ketua yang bisa mengedit/menghapus ketua atau petugas lain
+                                if ($user_role === 'ketua') {
+                                    echo '<a href="edit_user.php?id=' . $row['id_user'] . '" class="text-primary me-2"><i class="bi bi-pencil"></i> Edit</a>';
+                                    echo '<a href="#" onclick="confirmDelete(\'proses_hapus_user.php?id=' . $row['id_user'] . '\')" class="text-danger"><i class="bi bi-trash"></i> Hapus</a>';
+                                } elseif ($user_role === 'petugas') {
+                                    // Petugas hanya bisa mengedit/menghapus anggota atau unassigned
+                                    if ($row['role'] === 'anggota' || $row['role'] === 'unassigned') {
+                                        echo '<a href="edit_user.php?id=' . $row['id_user'] . '" class="text-primary me-2"><i class="bi bi-pencil"></i> Edit</a>';
+                                        echo '<a href="#" onclick="confirmDelete(\'proses_hapus_user.php?id=' . $row['id_user'] . '\')" class="text-danger"><i class="bi bi-trash"></i> Hapus</a>';
+                                    } else {
+                                        echo '<span class="text-muted">Tidak ada aksi</span>';
+                                    }
+                                }
                                 echo '</td>';
                                 echo '</tr>';
                             }
