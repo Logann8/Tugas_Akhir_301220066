@@ -8,6 +8,15 @@ if (!isset($_SESSION['user_id']) || !in_array(($_SESSION['user_role'] ?? ''), $a
 
 $user_role = $_SESSION['user_role'] ?? 'anggota'; // Default ke anggota jika tidak terdefinisi
 
+require 'config/database.php';
+
+// Query untuk mengambil data simpanan
+$query = "SELECT s.*, a.nama AS nama_anggota 
+          FROM simpanan s
+          JOIN anggota a ON s.id_anggota = a.id_anggota
+          ORDER BY s.tanggal DESC";
+$result = mysqli_query($conn, $query);
+
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -68,13 +77,18 @@ $user_role = $_SESSION['user_role'] ?? 'anggota'; // Default ke anggota jika tid
         <div class="card p-4 mb-4">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <div>
-                    <button class="btn btn-primary rounded-pill px-4"><i class="bi bi-plus"></i> Buat</button>
+                    <?php if (in_array($user_role, ['ketua', 'petugas'])) : ?>
+                    <a href="tambah_simpanan.php" class="btn btn-primary rounded-pill px-4"><i class="bi bi-plus"></i> Buat</a>
+                    <?php endif; ?>
                 </div>
                 <div>
                     <button class="btn btn-outline-secondary rounded-pill px-4"><i class="bi bi-download"></i> Unduh</button>
+                    <?php if ($user_role === 'ketua') : ?>
+                    <button class="btn btn-outline-info rounded-pill px-4 ms-2" onclick="printTable()"><i class="bi bi-printer"></i> Cetak</button>
+                    <?php endif; ?>
                 </div>
             </div>
-            <div class="table-responsive">
+            <div class="table-responsive" id="simpananTable">
                 <table class="table align-middle mb-0">
                     <thead class="table-light">
                         <tr>
@@ -87,27 +101,69 @@ $user_role = $_SESSION['user_role'] ?? 'anggota'; // Default ke anggota jika tid
                             <th>Fee</th>
                             <th>Total</th>
                             <th>Fiscal date</th>
-                            <th></th>
+                            <th>Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>1</td>
-                            <td>Dora Small</td>
-                            <td><span class="badge bg-danger-subtle text-danger">Pokok</span></td>
-                            <td><span class="badge bg-primary-subtle text-primary">Sekali</span></td>
-                            <td><span class="badge bg-success-subtle text-success">Verified</span></td>
-                            <td>Rp 150.000</td>
-                            <td>Rp 0</td>
-                            <td>Rp 150.000</td>
-                            <td>30 June 2024 12:12</td>
-                            <td><a href="#" class="text-primary"><i class="bi bi-eye"></i></a></td>
-                        </tr>
+                        <?php
+                        if (mysqli_num_rows($result) > 0) {
+                            $no = 1;
+                            while ($row = mysqli_fetch_assoc($result)) {
+                                // Menentukan kelas badge berdasarkan nilai dari database
+                                $type_badge_class = (
+                                    $row['jenis_simpanan'] === 'pokok' ? 'bg-danger-subtle text-danger' :
+                                    ($row['jenis_simpanan'] === 'wajib' ? 'bg-warning-subtle text-warning' :
+                                    'bg-info-subtle text-info')
+                                );
+                                $plan_badge_class = (
+                                    $row['plan'] === 'sekali' ? 'bg-primary-subtle text-primary' :
+                                    'bg-dark-subtle text-dark'
+                                );
+                                $status_badge_class = (
+                                    $row['status'] === 'verified' ? 'bg-success-subtle text-success' :
+                                    ($row['status'] === 'pending' ? 'bg-secondary-subtle text-secondary' :
+                                    'bg-danger-subtle text-danger')
+                                );
+                                
+                                // Format angka ke format rupiah
+                                $jumlah_formatted = 'Rp ' . number_format($row['jumlah'], 0, ',', '.');
+                                $fee_formatted = 'Rp ' . number_format($row['fee'], 0, ',', '.');
+                                $total = $row['jumlah'] + $row['fee'];
+                                $total_formatted = 'Rp ' . number_format($total, 0, ',', '.');
+
+                                // Format tanggal
+                                $fiscal_date_formatted = date('d F Y H:i', strtotime($row['fiscal_date']));
+
+                                echo '<tr id="simpanan-' . $row['id_simpanan'] . '">';
+                                echo '<td>' . $no++ . '</td>';
+                                echo '<td>' . htmlspecialchars($row['nama_anggota']) . '</td>';
+                                echo '<td><span class="badge ' . $type_badge_class . '">' . htmlspecialchars(ucfirst($row['jenis_simpanan'])) . '</span></td>';
+                                echo '<td><span class="badge ' . $plan_badge_class . '">' . htmlspecialchars(ucfirst($row['plan'])) . '</span></td>';
+                                echo '<td><span class="badge ' . $status_badge_class . '">' . htmlspecialchars(ucfirst($row['status'])) . '</span></td>';
+                                echo '<td>' . $jumlah_formatted . '</td>';
+                                echo '<td>' . $fee_formatted . '</td>';
+                                echo '<td>' . $total_formatted . '</td>';
+                                echo '<td>' . $fiscal_date_formatted . '</td>';
+                                echo '<td>';
+                                // Tombol aksi hanya untuk Ketua dan Petugas
+                                if (in_array($user_role, ['ketua', 'petugas'])) {
+                                    echo '<a href="edit_simpanan.php?id=' . $row['id_simpanan'] . '" class="text-primary me-2"><i class="bi bi-pencil"></i> Edit</a>';
+                                    echo '<a href="#" onclick="confirmDelete(\'proses_hapus_simpanan.php?id=' . $row['id_simpanan'] . '\')" class="text-danger"><i class="bi bi-trash"></i> Hapus</a>';
+                                } else {
+                                    echo '<a href="detail_simpanan.php?id=' . $row['id_simpanan'] . '" class="text-primary"><i class="bi bi-eye"></i> View</a>';
+                                }
+                                echo '</td>';
+                                echo '</tr>';
+                            }
+                        } else {
+                            echo '<tr><td colspan="10" class="text-center">Tidak ada data simpanan.</td></tr>';
+                        }
+                        ?>
                     </tbody>
                 </table>
             </div>
             <div class="d-flex justify-content-between align-items-center mt-3">
-                <div>Menampilkan 1 dari 2</div>
+                <div>Menampilkan <?php echo mysqli_num_rows($result); ?> dari <?php echo mysqli_num_rows($result); ?></div>
                 <div>
                     <select class="form-select form-select-sm d-inline-block" style="width: 120px;">
                         <option>Per halaman</option>
@@ -129,6 +185,23 @@ $user_role = $_SESSION['user_role'] ?? 'anggota'; // Default ke anggota jika tid
     }
     setInterval(updateDateTime, 1000);
     updateDateTime();
+
+    // Konfirmasi hapus
+    function confirmDelete(deleteUrl) {
+        if (confirm('Apakah Anda yakin ingin menghapus data ini?')) {
+            window.location.href = deleteUrl;
+        }
+    }
+
+    // Fungsi untuk mencetak tabel
+    function printTable() {
+        var printContents = document.getElementById("simpananTable").innerHTML;
+        var originalContents = document.body.innerHTML;
+        document.body.innerHTML = printContents;
+        window.print();
+        document.body.innerHTML = originalContents; // Mengembalikan konten asli
+        window.location.reload(); // Memuat ulang halaman untuk mengembalikan event listener dan script
+    }
     </script>
 </body>
 </html> 

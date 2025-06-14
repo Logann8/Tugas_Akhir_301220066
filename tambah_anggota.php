@@ -10,17 +10,13 @@ $user_role = $_SESSION['user_role'] ?? 'anggota'; // Default ke anggota jika tid
 
 require 'config/database.php';
 
-// Query untuk mengambil data anggota
-$query = "SELECT * FROM anggota ORDER BY nama ASC";
-$result = mysqli_query($conn, $query);
-
 ?>
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Anggota - SIKOPIN</title>
+    <title>Tambah Anggota - SIKOPIN</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="assets/css/style.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
@@ -70,68 +66,32 @@ $result = mysqli_query($conn, $query);
         </div>
     </div>
     <div class="main-content">
-        <h4 class="fw-bold mb-4">Daftar Anggota</h4>
-        <div class="card p-4 mb-4">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <div>
-                    <a href="tambah_anggota.php" class="btn btn-primary rounded-pill px-4"><i class="bi bi-plus"></i> Tambah Anggota</a>
+        <h4 class="fw-bold mb-4">Tambah Anggota Baru</h4>
+        <div class="card p-4">
+            <form action="proses_tambah_anggota.php" method="POST">
+                <div class="mb-3">
+                    <label for="nama" class="form-label">Nama</label>
+                    <input type="text" class="form-control" id="nama" name="nama" required>
                 </div>
-                <div>
-                    <button class="btn btn-outline-secondary rounded-pill px-4"><i class="bi bi-download"></i> Unduh</button>
+                <div class="mb-3">
+                    <label for="alamat" class="form-label">Alamat</label>
+                    <textarea class="form-control" id="alamat" name="alamat" rows="3" required></textarea>
                 </div>
-            </div>
-            <div class="table-responsive">
-                <table class="table align-middle mb-0">
-                    <thead class="table-light">
-                        <tr>
-                            <th>No</th>
-                            <th>Nama</th>
-                            <th>Alamat</th>
-                            <th>Telepon</th>
-                            <th>Email</th>
-                            <th>Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php
-                        if (mysqli_num_rows($result) > 0) {
-                            $no = 1;
-                            while ($row = mysqli_fetch_assoc($result)) {
-                                echo '<tr>';
-                                echo '<td>' . $no++ . '</td>';
-                                echo '<td>' . htmlspecialchars($row['nama']) . '</td>';
-                                echo '<td>' . htmlspecialchars($row['alamat']) . '</td>';
-                                echo '<td>' . htmlspecialchars($row['telepon']) . '</td>';
-                                echo '<td>' . htmlspecialchars($row['email']) . '</td>';
-                                echo '<td>';
-                                echo '<a href="edit_anggota.php?id=' . $row['id_anggota'] . '" class="text-primary me-2"><i class="bi bi-pencil"></i> Edit</a>';
-                                echo '<a href="#" onclick="confirmDelete(\'proses_hapus_anggota.php?id=' . $row['id_anggota'] . '\')" class="text-danger"><i class="bi bi-trash"></i> Hapus</a>';
-                                echo '</td>';
-                                echo '</tr>';
-                            }
-                        } else {
-                            echo '<tr><td colspan="6" class="text-center">Tidak ada data anggota.</td></tr>';
-                        }
-                        ?>
-                    </tbody>
-                </table>
-            </div>
-            <div class="d-flex justify-content-between align-items-center mt-3">
-                <div>Menampilkan <?php echo mysqli_num_rows($result); ?> dari <?php echo mysqli_num_rows($result); ?></div>
-                <div>
-                    <select class="form-select form-select-sm d-inline-block" style="width: 120px;">
-                        <option>Per halaman</option>
-                        <option selected>10</option>
-                        <option>25</option>
-                        <option>50</option>
-                    </select>
+                <div class="mb-3">
+                    <label for="telepon" class="form-label">Telepon</label>
+                    <input type="tel" class="form-control" id="telepon" name="telepon" required>
                 </div>
-            </div>
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email</label>
+                    <input type="email" class="form-control" id="email" name="email" required>
+                </div>
+                <button type="submit" class="btn btn-primary rounded-pill px-4"><i class="bi bi-plus"></i> Tambah Anggota</button>
+                <a href="anggota.php" class="btn btn-secondary rounded-pill px-4">Batal</a>
+            </form>
         </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-    // Tampilkan waktu realtime
     function updateDateTime() {
         const now = new Date();
         const options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' };
@@ -139,13 +99,6 @@ $result = mysqli_query($conn, $query);
     }
     setInterval(updateDateTime, 1000);
     updateDateTime();
-
-    // Konfirmasi hapus
-    function confirmDelete(deleteUrl) {
-        if (confirm('Apakah Anda yakin ingin menghapus data ini?')) {
-            window.location.href = deleteUrl;
-        }
-    }
     </script>
 </body>
 </html> 
