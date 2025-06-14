@@ -6,6 +6,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $password = $_POST['password'];
     $confirm_password = $_POST['confirm_password'];
     $nama = isset($_POST['nama']) ? mysqli_real_escape_string($conn, $_POST['nama']) : '';
+    $role = 'anggota'; // Register biasa hanya bisa anggota
 
     if ($password !== $confirm_password) {
         echo "<script>alert('Konfirmasi kata sandi tidak cocok!'); window.location='register.php';</script>";
@@ -20,7 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-    $insert = "INSERT INTO petugas (email, password, nama) VALUES ('$email', '$hashed_password', '$nama')";
+    $insert = "INSERT INTO petugas (email, password, nama, role) VALUES ('$email', '$hashed_password', '$nama', '$role')";
     if (mysqli_query($conn, $insert)) {
         echo "<script>alert('Registrasi berhasil! Silakan login.'); window.location='login.php';</script>";
     } else {

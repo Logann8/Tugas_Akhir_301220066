@@ -14,6 +14,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $_SESSION['user_id'] = $user['id_petugas'];
         $_SESSION['user_email'] = $user['email'];
         $_SESSION['user_nama'] = $user['nama'];
+        $_SESSION['user_role'] = $user['role'];
         header('Location: dasbor.php');
         exit;
     } else {

@@ -1,3 +1,11 @@
+<?php
+session_start();
+$allowed_roles = ['ketua', 'petugas'];
+if (!isset($_SESSION['user_id']) || !in_array(($_SESSION['user_role'] ?? ''), $allowed_roles)) {
+    header('Location: login.php');
+    exit;
+}
+?>
 <!DOCTYPE html>
 <html lang="id">
 <head>
