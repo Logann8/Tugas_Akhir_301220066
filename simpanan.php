@@ -54,7 +54,7 @@ $result = mysqli_query($conn, $query);
             </li>
             <?php endif; ?>
 
-            <?php if ($user_role === 'ketua') : ?>
+            <?php if (in_array($user_role, ['ketua', 'petugas'])) : ?>
             <li class="nav-item mb-1 mt-2">
                 <span class="text-muted small ms-2">Settings</span>
             </li>

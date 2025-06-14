@@ -10,13 +10,29 @@ $user_role = $_SESSION['user_role'] ?? '';
 
 require 'config/database.php';
 
+$id_user = $_GET['id'] ?? 0;
+
+// Ambil data user yang akan diedit
+$query_user = "SELECT id_user, nama, email, role FROM users WHERE id_user = ?";
+$stmt_user = mysqli_prepare($conn, $query_user);
+mysqli_stmt_bind_param($stmt_user, "i", $id_user);
+mysqli_stmt_execute($stmt_user);
+$result_user = mysqli_stmt_get_result($stmt_user);
+$user = mysqli_fetch_assoc($result_user);
+
+if (!$user) {
+    $_SESSION['error_message'] = "User tidak ditemukan.";
+    header('Location: user.php');
+    exit;
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tambah User - SIKOPIN</title>
+    <title>Edit User - SIKOPIN</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="assets/css/style.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
@@ -66,31 +82,32 @@ require 'config/database.php';
         </div>
     </div>
     <div class="main-content">
-        <h4 class="fw-bold mb-4">Tambah User</h4>
+        <h4 class="fw-bold mb-4">Edit User</h4>
         <div class="card p-4">
-            <form action="proses_tambah_user.php" method="POST">
+            <form action="proses_edit_user.php" method="POST">
+                <input type="hidden" name="id_user" value="<?php echo $user['id_user']; ?>">
                 <div class="mb-3">
                     <label for="nama" class="form-label">Nama</label>
-                    <input type="text" class="form-control" id="nama" name="nama" required>
+                    <input type="text" class="form-control" id="nama" name="nama" value="<?php echo htmlspecialchars($user['nama']); ?>" required>
                 </div>
                 <div class="mb-3">
                     <label for="email" class="form-label">Email</label>
-                    <input type="email" class="form-control" id="email" name="email" required>
+                    <input type="email" class="form-control" id="email" name="email" value="<?php echo htmlspecialchars($user['email']); ?>" required>
                 </div>
                 <div class="mb-3">
-                    <label for="password" class="form-label">Password</label>
-                    <input type="password" class="form-control" id="password" name="password" required>
+                    <label for="password" class="form-label">Password (Biarkan kosong jika tidak ingin mengubah)</label>
+                    <input type="password" class="form-control" id="password" name="password">
                 </div>
                 <div class="mb-3">
                     <label for="role" class="form-label">Role</label>
                     <select class="form-select" id="role" name="role" required>
                         <option value="">Pilih Role</option>
-                        <option value="ketua">Ketua</option>
-                        <option value="petugas">Petugas</option>
-                        <option value="anggota">Anggota</option>
+                        <option value="ketua" <?php echo ($user['role'] == 'ketua' ? 'selected' : ''); ?>>Ketua</option>
+                        <option value="petugas" <?php echo ($user['role'] == 'petugas' ? 'selected' : ''); ?>>Petugas</option>
+                        <option value="anggota" <?php echo ($user['role'] == 'anggota' ? 'selected' : ''); ?>>Anggota</option>
                     </select>
                 </div>
-                <button type="submit" class="btn btn-primary rounded-pill px-4"><i class="bi bi-plus"></i> Tambah User</button>
+                <button type="submit" class="btn btn-primary rounded-pill px-4"><i class="bi bi-save"></i> Simpan Perubahan</button>
                 <a href="user.php" class="btn btn-secondary rounded-pill px-4">Batal</a>
             </form>
         </div>

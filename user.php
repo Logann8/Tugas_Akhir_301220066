@@ -1,11 +1,25 @@
 <?php
 session_start();
-if (!isset($_SESSION['user_id']) || ($_SESSION['user_role'] ?? '') !== 'ketua') {
+$allowed_roles = ['ketua', 'petugas'];
+if (!isset($_SESSION['user_id']) || !in_array(($_SESSION['user_role'] ?? ''), $allowed_roles)) {
     header('Location: login.php');
     exit;
 }
 
-$user_role = $_SESSION['user_role'] ?? 'anggota'; // Default ke anggota jika tidak terdefinisi
+$user_role = $_SESSION['user_role'] ?? '';
+
+require 'config/database.php';
+
+$search_query = $_GET['search'] ?? '';
+$where_clause = '';
+if (!empty($search_query)) {
+    $search_term = '%' . mysqli_real_escape_string($conn, $search_query) . '%';
+    $where_clause = " WHERE nama LIKE '$search_term' OR email LIKE '$search_term' OR role LIKE '$search_term'";
+}
+
+// Query untuk mengambil data user
+$query = "SELECT id_user, nama, email, role FROM users" . $where_clause . " ORDER BY role ASC, nama ASC";
+$result = mysqli_query($conn, $query);
 
 ?>
 <!DOCTYPE html>
@@ -44,7 +58,7 @@ $user_role = $_SESSION['user_role'] ?? 'anggota'; // Default ke anggota jika tid
             </li>
             <?php endif; ?>
 
-            <?php if ($user_role === 'ketua') : ?>
+            <?php if (in_array($user_role, ['ketua', 'petugas'])) : ?>
             <li class="nav-item mb-1 mt-2">
                 <span class="text-muted small ms-2">Settings</span>
             </li>
@@ -69,8 +83,11 @@ $user_role = $_SESSION['user_role'] ?? 'anggota'; // Default ke anggota jika tid
                 <div>
                     <a href="tambah_user.php" class="btn btn-primary rounded-pill px-4"><i class="bi bi-plus"></i> Buat</a>
                 </div>
-                <div>
-                    <button class="btn btn-outline-secondary rounded-pill px-4"><i class="bi bi-download"></i> Unduh</button>
+                <div class="d-flex">
+                    <form class="d-flex" method="GET" action="user.php">
+                        <input type="text" class="form-control me-2" placeholder="Cari User..." name="search" value="<?php echo htmlspecialchars($search_query); ?>">
+                        <button class="btn btn-outline-secondary" type="submit"><i class="bi bi-search"></i> Cari</button>
+                    </form>
                 </div>
             </div>
             <div class="table-responsive">
@@ -78,25 +95,42 @@ $user_role = $_SESSION['user_role'] ?? 'anggota'; // Default ke anggota jika tid
                     <thead class="table-light">
                         <tr>
                             <th>No</th>
-                            <th>Email</th>
+                            <th>Role</th>
                             <th>Nama</th>
-                            <th>Tanggal Daftar</th>
-                            <th></th>
+                            <th>Email</th>
+                            <th>Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>1</td>
-                            <td>admin@mail.com</td>
-                            <td>Admin</td>
-                            <td>01 Juli 2024</td>
-                            <td><a href="#" class="text-primary"><i class="bi bi-eye"></i></a></td>
-                        </tr>
+                        <?php
+                        if (mysqli_num_rows($result) > 0) {
+                            $no = 1;
+                            while ($row = mysqli_fetch_assoc($result)) {
+                                $role_badge_class = (
+                                    $row['role'] === 'ketua' ? 'bg-primary-subtle text-primary' :
+                                    ($row['role'] === 'petugas' ? 'bg-info-subtle text-info' :
+                                    'bg-success-subtle text-success')
+                                );
+                                echo '<tr id="user-' . $row['id_user'] . '">';
+                                echo '<td>' . $no++ . '</td>';
+                                echo '<td><span class="badge ' . $role_badge_class . '">' . htmlspecialchars(ucfirst($row['role'])) . '</span></td>';
+                                echo '<td>' . htmlspecialchars($row['nama']) . '</td>';
+                                echo '<td>' . htmlspecialchars($row['email']) . '</td>';
+                                echo '<td>';
+                                echo '<a href="edit_user.php?id=' . $row['id_user'] . '" class="text-primary me-2"><i class="bi bi-pencil"></i> Edit</a>';
+                                echo '<a href="#" onclick="confirmDelete(\'proses_hapus_user.php?id=' . $row['id_user'] . '\')" class="text-danger"><i class="bi bi-trash"></i> Hapus</a>';
+                                echo '</td>';
+                                echo '</tr>';
+                            }
+                        } else {
+                            echo '<tr><td colspan="5" class="text-center">Tidak ada data user.</td></tr>';
+                        }
+                        ?>
                     </tbody>
                 </table>
             </div>
             <div class="d-flex justify-content-between align-items-center mt-3">
-                <div>Menampilkan 1 dari 1</div>
+                <div>Menampilkan <?php echo mysqli_num_rows($result); ?> dari <?php echo mysqli_num_rows($result); ?></div>
                 <div>
                     <select class="form-select form-select-sm d-inline-block" style="width: 120px;">
                         <option>Per halaman</option>
@@ -110,7 +144,6 @@ $user_role = $_SESSION['user_role'] ?? 'anggota'; // Default ke anggota jika tid
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-    // Tampilkan waktu realtime
     function updateDateTime() {
         const now = new Date();
         const options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' };
@@ -118,6 +151,13 @@ $user_role = $_SESSION['user_role'] ?? 'anggota'; // Default ke anggota jika tid
     }
     setInterval(updateDateTime, 1000);
     updateDateTime();
+
+    // Konfirmasi hapus
+    function confirmDelete(deleteUrl) {
+        if (confirm('Apakah Anda yakin ingin menghapus data ini?')) {
+            window.location.href = deleteUrl;
+        }
+    }
     </script>
 </body>
 </html> 
