@@ -80,9 +80,6 @@ $result = mysqli_query($conn, $query);
         <h4 class="fw-bold mb-4">User</h4>
         <div class="card p-4 mb-4">
             <div class="d-flex justify-content-between align-items-center mb-3">
-                <div>
-                    <a href="tambah_user.php" class="btn btn-primary rounded-pill px-4"><i class="bi bi-plus"></i> Buat</a>
-                </div>
                 <div class="d-flex">
                     <form class="d-flex" method="GET" action="user.php">
                         <input type="text" class="form-control me-2" placeholder="Cari User..." name="search" value="<?php echo htmlspecialchars($search_query); ?>">
