@@ -101,7 +101,7 @@ $result = mysqli_query($conn, $query);
                                 echo '<td>' . $no++ . '</td>';
                                 echo '<td>' . htmlspecialchars($row['nama']) . '</td>';
                                 echo '<td>' . htmlspecialchars($row['alamat']) . '</td>';
-                                echo '<td>' . htmlspecialchars($row['telepon']) . '</td>';
+                                echo '<td>' . htmlspecialchars($row['no_telp']) . '</td>';
                                 echo '<td>' . htmlspecialchars($row['email']) . '</td>';
                                 echo '<td>';
                                 echo '<div class="d-flex gap-2">';

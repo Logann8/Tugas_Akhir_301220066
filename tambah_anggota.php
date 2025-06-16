@@ -10,12 +10,23 @@ $user_role = $_SESSION['user_role'] ?? 'anggota'; // Default ke anggota jika tid
 
 require 'config/database.php';
 
+// Aktifkan error reporting untuk debugging
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
 // Ambil daftar user dengan role anggota yang belum menjadi anggota
 $query = "SELECT u.id_user, u.nama, u.email 
           FROM users u 
           LEFT JOIN anggota a ON u.id_user = a.id_user 
           WHERE u.role = 'anggota' AND a.id_user IS NULL";
 $result = mysqli_query($conn, $query);
+
+// Debug: Cek apakah query berhasil
+if ($result === false) {
+    echo "Error SQL: " . mysqli_error($conn);
+    exit;
+}
+
 $users = mysqli_fetch_all($result, MYSQLI_ASSOC);
 ?>
 <!DOCTYPE html>
@@ -100,16 +111,6 @@ $users = mysqli_fetch_all($result, MYSQLI_ASSOC);
                             </option>
                         <?php endforeach; ?>
                     </select>
-                </div>
-
-                <div class="mb-3">
-                    <label for="telepon" class="form-label">Telepon</label>
-                    <input type="tel" class="form-control" id="telepon" name="telepon" required>
-                </div>
-
-                <div class="mb-3">
-                    <label for="alamat" class="form-label">Alamat</label>
-                    <textarea class="form-control" id="alamat" name="alamat" rows="3" required></textarea>
                 </div>
 
                 <button type="submit" class="btn btn-primary btn-submit">

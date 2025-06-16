@@ -17,8 +17,9 @@ if (!empty($search_query)) {
     $where_clause = " WHERE nama LIKE '$search_term' OR email LIKE '$search_term' OR role LIKE '$search_term'";
 }
 
-// Query untuk mengambil data user
-$query = "SELECT id_user, nama, email, role FROM users" . $where_clause . " ORDER BY role ASC, nama ASC";
+// Query untuk mengambil data user dengan urutan kustom
+// Urutan: ketua, petugas, anggota, lalu yang kosong/unassigned
+$query = "SELECT id_user, nama, email, role FROM users" . $where_clause . " ORDER BY FIELD(role, 'ketua', 'petugas', 'anggota'), FIELD(role, '') ASC, nama ASC";
 $result = mysqli_query($conn, $query);
 
 ?>
@@ -123,8 +124,8 @@ $result = mysqli_query($conn, $query);
                                     echo '<a href="edit_user.php?id=' . $row['id_user'] . '" class="text-primary me-2"><i class="bi bi-pencil"></i> Edit</a>';
                                     echo '<a href="#" onclick="confirmDelete(\'proses_hapus_user.php?id=' . $row['id_user'] . '\')" class="text-danger"><i class="bi bi-trash"></i> Hapus</a>';
                                 } elseif ($user_role === 'petugas') {
-                                    // Petugas hanya bisa mengedit/menghapus anggota atau unassigned
-                                    if ($row['role'] === 'anggota' || $row['role'] === 'unassigned') {
+                                    // Petugas hanya bisa mengedit/menghapus anggota atau yang unassigned (role kosong)
+                                    if ($row['role'] === 'anggota' || $row['role'] === '') {
                                         echo '<a href="edit_user.php?id=' . $row['id_user'] . '" class="text-primary me-2"><i class="bi bi-pencil"></i> Edit</a>';
                                         echo '<a href="#" onclick="confirmDelete(\'proses_hapus_user.php?id=' . $row['id_user'] . '\')" class="text-danger"><i class="bi bi-trash"></i> Hapus</a>';
                                     } else {
