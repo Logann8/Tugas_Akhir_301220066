@@ -10,18 +10,15 @@ $user_role = $_SESSION['user_role'] ?? 'anggota'; // Default ke anggota jika tid
 
 require 'config/database.php';
 
-$id_anggota = $_GET['id'] ?? 0;
-
-// Ambil data anggota yang akan diedit
-$query_anggota = "SELECT * FROM anggota WHERE id_anggota = ?";
-$stmt_anggota = mysqli_prepare($conn, $query_anggana);
-mysqli_stmt_bind_param($stmt_anggota, "i", $id_anggota);
-mysqli_stmt_execute($stmt_anggota);
-$result_anggota = mysqli_stmt_get_result($stmt_anggota);
-$anggota = mysqli_fetch_assoc($result_anggota);
-
-if (!$anggota) {
-    $_SESSION['error_message'] = "Data anggota tidak ditemukan.";
+if (isset($_GET['id'])) {
+    $id = $_GET['id'];
+    $query_anggota = "SELECT * FROM anggota WHERE id_anggota = ?";
+    $stmt = mysqli_prepare($conn, $query_anggota);
+    mysqli_stmt_bind_param($stmt, "i", $id);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
+    $anggota = mysqli_fetch_assoc($result);
+} else {
     header('Location: anggota.php');
     exit;
 }

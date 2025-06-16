@@ -86,6 +86,9 @@ $result = mysqli_query($conn, $query);
                         <button class="btn btn-outline-secondary" type="submit"><i class="bi bi-search"></i> Cari</button>
                     </form>
                 </div>
+                <a href="tambah_user.php" class="btn btn-primary">
+                    <i class="bi bi-plus"></i> Tambah User
+                </a>
             </div>
             <div class="table-responsive">
                 <table class="table align-middle mb-0">

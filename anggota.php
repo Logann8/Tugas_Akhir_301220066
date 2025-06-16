@@ -104,8 +104,12 @@ $result = mysqli_query($conn, $query);
                                 echo '<td>' . htmlspecialchars($row['telepon']) . '</td>';
                                 echo '<td>' . htmlspecialchars($row['email']) . '</td>';
                                 echo '<td>';
-                                echo '<a href="edit_anggota.php?id=' . $row['id_anggota'] . '" class="text-primary me-2"><i class="bi bi-pencil"></i> Edit</a>';
-                                echo '<a href="#" onclick="confirmDelete(\'proses_hapus_anggota.php?id=' . $row['id_anggota'] . '\')" class="text-danger"><i class="bi bi-trash"></i> Hapus</a>';
+                                echo '<div class="d-flex gap-2">';
+                                echo '<a href="edit_anggota.php?id=' . $row['id_anggota'] . '" class="btn btn-warning btn-sm">';
+                                echo '<i class="bi bi-pencil"></i> Edit</a>';
+                                echo '<button type="button" class="btn btn-danger btn-sm" onclick="hapusAnggota(' . $row['id_anggota'] . ')">';
+                                echo '<i class="bi bi-trash"></i> Hapus</button>';
+                                echo '</div>';
                                 echo '</td>';
                                 echo '</tr>';
                             }
@@ -140,10 +144,9 @@ $result = mysqli_query($conn, $query);
     setInterval(updateDateTime, 1000);
     updateDateTime();
 
-    // Konfirmasi hapus
-    function confirmDelete(deleteUrl) {
-        if (confirm('Apakah Anda yakin ingin menghapus data ini?')) {
-            window.location.href = deleteUrl;
+    function hapusAnggota(id) {
+        if (confirm('Apakah Anda yakin ingin menghapus anggota ini?')) {
+            window.location.href = 'proses_hapus_anggota.php?id=' + id;
         }
     }
     </script>
