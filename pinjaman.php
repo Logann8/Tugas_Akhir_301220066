@@ -10,11 +10,29 @@ $user_role = $_SESSION['user_role'] ?? 'anggota'; // Default ke anggota jika tid
 
 require 'config/database.php';
 
+$anggota_id = null;
+if ($user_role === 'anggota') {
+    // Dapatkan id_anggota yang terkait dengan user_id yang sedang login
+    // Asumsi: Ada kolom id_user di tabel anggota yang terhubung dengan user_id di tabel petugas
+    $user_id_session = $_SESSION['user_id'] ?? 0;
+    $query_anggota_id = "SELECT id_anggota FROM anggota WHERE id_user = '$user_id_session' LIMIT 1";
+    $result_anggota_id = mysqli_query($conn, $query_anggota_id);
+    if ($result_anggota_id && mysqli_num_rows($result_anggota_id) > 0) {
+        $row_anggota_id = mysqli_fetch_assoc($result_anggota_id);
+        $anggota_id = $row_anggota_id['id_anggota'];
+    }
+}
+
 // Query untuk mengambil data pinjaman
 $query = "SELECT p.*, a.nama AS nama_anggota 
           FROM pinjaman p
-          JOIN anggota a ON p.id_anggota = a.id_anggota
-          ORDER BY p.tanggal_pinjaman DESC";
+          JOIN anggota a ON p.id_anggota = a.id_anggota";
+
+if ($user_role === 'anggota' && $anggota_id) {
+    $query .= " WHERE p.id_anggota = '$anggota_id'";
+}
+
+$query .= " ORDER BY p.tanggal_pinjaman DESC";
 $result = mysqli_query($conn, $query);
 
 ?>
@@ -116,10 +134,14 @@ $result = mysqli_query($conn, $query);
 
                                 $jumlah_pinjaman_formatted = 'Rp ' . number_format($row['jumlah_pinjaman'], 0, ',', '.');
                                 $bunga_formatted = $row['bunga'] . '%';
-                                $total_pinjaman_formatted = 'Rp ' . number_format($row['total_pinjaman'], 0, ',', '.');
+
+                                // Hitung total pinjaman secara dinamis jika diperlukan untuk tampilan
+                                $total_pinjaman_calculated = $row['jumlah_pinjaman'] + ($row['jumlah_pinjaman'] * ($row['bunga'] / 100));
+                                $total_pinjaman_formatted = 'Rp ' . number_format($total_pinjaman_calculated, 0, ',', '.');
 
                                 $tanggal_pinjam_formatted = date('d F Y', strtotime($row['tanggal_pinjaman']));
-                                $tanggal_kembali_formatted = date('d F Y', strtotime($row['tanggal_kembali']));
+                                // Menggunakan fiscal_date sebagai tanggal kembali
+                                $tanggal_kembali_formatted = date('d F Y', strtotime($row['fiscal_date']));
 
                                 echo '<tr id="pinjaman-' . $row['id_pinjaman'] . '">';
                                 echo '<td>' . $no++ . '</td>';

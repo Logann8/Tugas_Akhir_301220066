@@ -10,11 +10,29 @@ $user_role = $_SESSION['user_role'] ?? 'anggota'; // Default ke anggota jika tid
 
 require 'config/database.php';
 
+$anggota_id = null;
+if ($user_role === 'anggota') {
+    // Dapatkan id_anggota yang terkait dengan user_id yang sedang login
+    // Asumsi: Ada kolom id_user di tabel anggota yang terhubung dengan user_id di tabel petugas
+    $user_id_session = $_SESSION['user_id'] ?? 0;
+    $query_anggota_id = "SELECT id_anggota FROM anggota WHERE id_user = '$user_id_session' LIMIT 1";
+    $result_anggota_id = mysqli_query($conn, $query_anggota_id);
+    if ($result_anggota_id && mysqli_num_rows($result_anggota_id) > 0) {
+        $row_anggota_id = mysqli_fetch_assoc($result_anggota_id);
+        $anggota_id = $row_anggota_id['id_anggota'];
+    }
+}
+
 // Query untuk mengambil data simpanan
 $query = "SELECT s.*, a.nama AS nama_anggota 
           FROM simpanan s
-          JOIN anggota a ON s.id_anggota = a.id_anggota
-          ORDER BY s.tanggal DESC";
+          JOIN anggota a ON s.id_anggota = a.id_anggota";
+
+if ($user_role === 'anggota' && $anggota_id) {
+    $query .= " WHERE s.id_anggota = '$anggota_id'";
+}
+
+$query .= " ORDER BY s.tanggal DESC";
 $result = mysqli_query($conn, $query);
 
 ?>
