@@ -10,95 +10,115 @@ $user_role = $_SESSION['user_role'] ?? 'anggota'; // Default ke anggota jika tid
 
 require 'config/database.php';
 
+// Ambil daftar user dengan role anggota yang belum menjadi anggota
+$query = "SELECT u.id_user, u.nama, u.email 
+          FROM users u 
+          LEFT JOIN anggota a ON u.id_user = a.id_user 
+          WHERE u.role = 'anggota' AND a.id_user IS NULL";
+$result = mysqli_query($conn, $query);
+$users = mysqli_fetch_all($result, MYSQLI_ASSOC);
 ?>
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tambah Anggota - SIKOPIN</title>
+    <title>Tambah Anggota - Koperasi</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="assets/css/style.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .form-container {
+            max-width: 500px;
+            margin: 2rem auto;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            background: white;
+        }
+        .form-title {
+            color: #2c3e50;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+        .form-label {
+            font-weight: 500;
+            color: #34495e;
+        }
+        .form-control {
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            padding: 0.75rem;
+        }
+        .form-control:focus {
+            border-color: #3498db;
+            box-shadow: 0 0 0 0.2rem rgba(52,152,219,0.25);
+        }
+        .btn-submit {
+            background-color: #3498db;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            font-weight: 500;
+            width: 100%;
+            margin-top: 1rem;
+        }
+        .btn-submit:hover {
+            background-color: #2980b9;
+        }
+        .alert {
+            border-radius: 5px;
+            margin-bottom: 1rem;
+        }
+    </style>
 </head>
-<body>
-    <div class="sidebar d-flex flex-column align-items-center p-3">
-        <img src="https://ui-avatars.com/api/?name=<?php echo urlencode($_SESSION['user_nama'] ?? 'Admin'); ?>" class="profile-img" alt="Profile">
-        <ul class="nav flex-column w-100">
-            <li class="nav-item mb-1">
-                <a class="nav-link" href="dasbor.php"><i class="bi bi-house-door"></i> <span>Dasbor</span></a>
-            </li>
-            <li class="nav-item mb-1">
-                <span class="text-muted small ms-2">Main</span>
-            </li>
-            <li class="nav-item mb-1 ms-2">
-                <a class="nav-link" href="simpanan.php"><i class="bi bi-wallet2"></i> <span>Simpanan</span></a>
-            </li>
-            <li class="nav-item mb-1 ms-2">
-                <a class="nav-link" href="pinjaman.php"><i class="bi bi-cash-stack"></i> <span>Pinjaman</span></a>
-            </li>
+<body class="bg-light">
+    <div class="container">
+        <div class="form-container">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="form-title mb-0">Tambah Anggota</h2>
+                <a href="anggota.php" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left"></i> Kembali
+                </a>
+            </div>
 
-            <?php if (in_array($user_role, ['ketua', 'petugas'])) : ?>
-            <li class="nav-item mb-1 mt-2">
-                <span class="text-muted small ms-2">Master Data</span>
-            </li>
-            <li class="nav-item mb-1 ms-2">
-                <a class="nav-link active" href="anggota.php"><i class="bi bi-people"></i> <span>Anggota</span></a>
-            </li>
+            <?php if (isset($_SESSION['error_message'])): ?>
+                <div class="alert alert-danger">
+                    <?php 
+                    echo $_SESSION['error_message'];
+                    unset($_SESSION['error_message']);
+                    ?>
+                </div>
             <?php endif; ?>
 
-            <?php if ($user_role === 'ketua') : ?>
-            <li class="nav-item mb-1 mt-2">
-                <span class="text-muted small ms-2">Settings</span>
-            </li>
-            <li class="nav-item mb-1 ms-2">
-                <a class="nav-link" href="user.php"><i class="bi bi-person-gear"></i> <span>User</span></a>
-            </li>
-            <?php endif; ?>
-        </ul>
-    </div>
-    <div class="topbar">
-        <span class="fw-bold fs-5">SIKOPIN</span>
-        <span id="datetime" class="text-muted"></span>
-        <div class="d-flex align-items-center gap-2">
-            <span class="fw-semibold text-dark"><?php echo htmlspecialchars($_SESSION['user_nama'] ?? $_SESSION['user_email']); ?></span>
-            <a href="logout.php" class="btn btn-outline-danger btn-sm rounded-pill ms-2">Logout <i class="bi bi-box-arrow-right"></i></a>
-        </div>
-    </div>
-    <div class="main-content">
-        <h4 class="fw-bold mb-4">Tambah Anggota Baru</h4>
-        <div class="card p-4">
             <form action="proses_tambah_anggota.php" method="POST">
                 <div class="mb-3">
-                    <label for="nama" class="form-label">Nama</label>
-                    <input type="text" class="form-control" id="nama" name="nama" required>
+                    <label for="id_user" class="form-label">Pilih User</label>
+                    <select class="form-control" id="id_user" name="id_user" required>
+                        <option value="">Pilih User</option>
+                        <?php foreach ($users as $user): ?>
+                            <option value="<?php echo $user['id_user']; ?>">
+                                <?php echo htmlspecialchars($user['nama'] . ' (' . $user['email'] . ')'); ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
                 </div>
-                <div class="mb-3">
-                    <label for="alamat" class="form-label">Alamat</label>
-                    <textarea class="form-control" id="alamat" name="alamat" rows="3" required></textarea>
-                </div>
+
                 <div class="mb-3">
                     <label for="telepon" class="form-label">Telepon</label>
                     <input type="tel" class="form-control" id="telepon" name="telepon" required>
                 </div>
+
                 <div class="mb-3">
-                    <label for="email" class="form-label">Email</label>
-                    <input type="email" class="form-control" id="email" name="email" required>
+                    <label for="alamat" class="form-label">Alamat</label>
+                    <textarea class="form-control" id="alamat" name="alamat" rows="3" required></textarea>
                 </div>
-                <button type="submit" class="btn btn-primary rounded-pill px-4"><i class="bi bi-plus"></i> Tambah Anggota</button>
-                <a href="anggota.php" class="btn btn-secondary rounded-pill px-4">Batal</a>
+
+                <button type="submit" class="btn btn-primary btn-submit">
+                    <i class="fas fa-save"></i> Simpan
+                </button>
             </form>
         </div>
     </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-    function updateDateTime() {
-        const now = new Date();
-        const options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' };
-        document.getElementById('datetime').textContent = now.toLocaleString('id-ID', options);
-    }
-    setInterval(updateDateTime, 1000);
-    updateDateTime();
-    </script>
 </body>
 </html> 

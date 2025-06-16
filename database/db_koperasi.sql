@@ -2,15 +2,25 @@
 CREATE DATABASE IF NOT EXISTS db_koperasi;
 USE db_koperasi;
 
+-- Tabel Users
+CREATE TABLE IF NOT EXISTS users (
+    id_user INT PRIMARY KEY AUTO_INCREMENT,
+    nama VARCHAR(100) NOT NULL,
+    email VARCHAR(100) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    role ENUM('ketua', 'petugas', 'anggota') NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 -- Tabel Anggota
 CREATE TABLE IF NOT EXISTS anggota (
     id_anggota INT PRIMARY KEY AUTO_INCREMENT,
-    nama VARCHAR(100) NOT NULL,
+    id_user INT NOT NULL,
+    telepon VARCHAR(20),
     alamat TEXT NOT NULL,
-    no_telp VARCHAR(20),
-    email VARCHAR(100),
     tanggal_daftar DATE NOT NULL,
-    status ENUM('aktif', 'tidak aktif') DEFAULT 'aktif'
+    status ENUM('aktif', 'tidak aktif') DEFAULT 'aktif',
+    FOREIGN KEY (id_user) REFERENCES users(id_user)
 );
 
 -- Tabel Simpanan
@@ -53,11 +63,6 @@ CREATE TABLE IF NOT EXISTS angsuran (
     FOREIGN KEY (id_pinjaman) REFERENCES pinjaman(id_pinjaman)
 );
 
--- Tabel Petugas/User
-CREATE TABLE IF NOT EXISTS petugas (
-    id_petugas INT PRIMARY KEY AUTO_INCREMENT,
-    email VARCHAR(100) NOT NULL UNIQUE,
-    password VARCHAR(255) NOT NULL,
-    nama VARCHAR(100),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-); 
+-- Insert default admin user (password: admin123)
+INSERT INTO users (nama, email, password, role) VALUES 
+('Administrator', 'admin@koperasi.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'ketua'); 

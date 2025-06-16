@@ -10,13 +10,21 @@ require 'config/database.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = trim($_POST['username'] ?? '');
+    $email = trim($_POST['email'] ?? '');
     $password = $_POST['password'] ?? '';
     $confirm_password = $_POST['confirm_password'] ?? '';
     $role = $_POST['role'] ?? '';
 
     // Validasi input
-    if (empty($username) || empty($password) || empty($confirm_password) || empty($role)) {
+    if (empty($username) || empty($email) || empty($password) || empty($confirm_password) || empty($role)) {
         $_SESSION['error_message'] = "Semua field harus diisi!";
+        header('Location: tambah_user.php');
+        exit;
+    }
+
+    // Validasi email
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $_SESSION['error_message'] = "Format email tidak valid!";
         header('Location: tambah_user.php');
         exit;
     }
@@ -37,14 +45,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     // Cek apakah username sudah ada
-    $check_query = "SELECT * FROM users WHERE nama = ?";
+    $check_query = "SELECT * FROM users WHERE nama = ? OR email = ?";
     $check_stmt = mysqli_prepare($conn, $check_query);
-    mysqli_stmt_bind_param($check_stmt, "s", $username);
+    mysqli_stmt_bind_param($check_stmt, "ss", $username, $email);
     mysqli_stmt_execute($check_stmt);
     mysqli_stmt_store_result($check_stmt);
 
     if (mysqli_stmt_num_rows($check_stmt) > 0) {
-        $_SESSION['error_message'] = "Username sudah digunakan!";
+        $_SESSION['error_message'] = "Username atau email sudah digunakan!";
         header('Location: tambah_user.php');
         exit;
     }
@@ -56,7 +64,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Insert user baru
     $query = "INSERT INTO users (nama, email, password, role) VALUES (?, ?, ?, ?)";
     $stmt = mysqli_prepare($conn, $query);
-    $email = $username . "@koperasi.com"; // Membuat email default dari username
     mysqli_stmt_bind_param($stmt, "ssss", $username, $email, $hashed_password, $role);
 
     if (mysqli_stmt_execute($stmt)) {
